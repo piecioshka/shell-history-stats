@@ -143,7 +143,7 @@ Sections that need a timestamp say how many entries they had to skip, so a bash-
 
 ## Privacy 🛡️
 
-Everything runs locally - no network access, no telemetry. Values that look like credentials (tokens, `--password`, API keys, long opaque strings) are masked before they reach any output, so a report is safe to paste into notes or an issue. Counts are computed before masking, so the numbers stay correct. Pass `--no-redact` if you want the raw text.
+Everything runs locally - no network access, no telemetry. Values that look like credentials are masked before they reach any output, so a report is safe to paste into notes or an issue: API tokens, `--password` and `-pSecret`, `user:password` pairs in an argument or a connection URI, secrets carried by a header, and long opaque strings. Your home directory is shortened to `~`, so a report does not name your account. Counts are computed before masking, so the numbers stay correct. Pass `--no-redact` if you want the raw text.
 
 ## API 📚
 
