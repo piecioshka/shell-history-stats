@@ -55,6 +55,19 @@ describe("parseArgs", () => {
   });
 });
 
+describe("--top", () => {
+  it.each(["0", "-5", "abc", "1e10", "5x", ""])(
+    "rejects %j",
+    (value: string) => {
+      expect(() => parseArgs(["--top", value])).toThrow(UsageError);
+    },
+  );
+
+  it("accepts a plain positive number", () => {
+    expect(parseArgs(["--top", "30"]).top).toBe(30);
+  });
+});
+
 describe("parseSince", () => {
   const now = new Date("2026-09-01T00:00:00Z");
 

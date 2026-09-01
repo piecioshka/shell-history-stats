@@ -122,11 +122,13 @@ export function parseArgs(argv: string[]): Options {
         options.out = value();
         break;
       case "--top": {
-        const top = Number.parseInt(value(), 10);
-        if (!Number.isFinite(top) || top <= 0) {
+        // parseInt stops at the first non-digit, so `1e10` would quietly become
+        // 1 and `5x` would become 5; the whole value has to be digits.
+        const raw = value();
+        if (!/^[0-9]+$/.test(raw) || Number.parseInt(raw, 10) <= 0) {
           throw new UsageError("--top needs a positive number");
         }
-        options.top = top;
+        options.top = Number.parseInt(raw, 10);
         break;
       }
       case "--since":

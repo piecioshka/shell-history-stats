@@ -148,10 +148,6 @@ function redactReport(report: Report): Report {
     })),
     hygiene: {
       ...report.hygiene,
-      longest: report.hygiene.longest.map((item) => ({
-        ...item,
-        raw: redact(item.raw),
-      })),
       aliasCandidates: report.hygiene.aliasCandidates.map((item) => ({
         ...item,
         raw: redact(item.raw),

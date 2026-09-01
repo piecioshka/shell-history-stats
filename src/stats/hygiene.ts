@@ -19,7 +19,6 @@ export interface HygieneStats {
   usedOnceRatio: number;
   averageLength: number;
   medianLength: number;
-  longest: Array<{ raw: string; length: number }>;
   typoCandidates: TypoCandidate[];
   aliasCandidates: AliasCandidate[];
 }
@@ -133,9 +132,9 @@ const KNOWN_COMMANDS = new Set([
 
 export function collectHygieneStats(
   invocations: Invocation[],
-  options: { topLongest?: number; topTypos?: number; topAliases?: number } = {},
+  options: { topTypos?: number; topAliases?: number } = {},
 ): HygieneStats {
-  const { topLongest = 5, topTypos = 10, topAliases = 10 } = options;
+  const { topTypos = 10, topAliases = 10 } = options;
 
   const commandCounts = new Map<string, number>();
   const rawCounts = new Map<string, number>();
@@ -164,10 +163,6 @@ export function collectHygieneStats(
         ? 0
         : lengths.reduce((sum, length) => sum + length, 0) / lengths.length,
     medianLength: median(sortedLengths),
-    longest: [...rawCounts.keys()]
-      .map((raw) => ({ raw, length: raw.length }))
-      .sort((a, b) => b.length - a.length)
-      .slice(0, topLongest),
     typoCandidates: findTypoCandidates(commandCounts).slice(0, topTypos),
     aliasCandidates: findAliasCandidates(rawCounts).slice(0, topAliases),
   };
