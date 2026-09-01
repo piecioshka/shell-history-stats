@@ -1,0 +1,5 @@
+: 1735730400:0;git push --force
+: 1735730500:0;npm run build
+plain command without timestamp
+: 1735730600:12;echo multi \
+line command

@@ -1,0 +1,3 @@
+ls
+sudo apt install curl
+git status

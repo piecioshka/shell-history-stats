@@ -1,0 +1,71 @@
+{
+  "name": "shell-history-stats",
+  "version": "0.1.0",
+  "description": "🔨 Analyze your local shell history (fish, zsh, bash) and build statistics of the most used commands, subcommands and flags",
+  "keywords": [
+    "shell",
+    "history",
+    "statistics",
+    "cli",
+    "fish",
+    "zsh",
+    "bash"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "shell-history-stats": "bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "index.js",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "!**/*.spec.*",
+    "!**/*.test.*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clear": "rm -rf dist coverage",
+    "prepack": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "start": "node bin/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piecioshka/shell-history-stats.git"
+  },
+  "author": {
+    "name": "Piotr Kowalski",
+    "email": "piecioshka@gmail.com",
+    "url": "https://piecioshka.pl"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/piecioshka/shell-history-stats/issues"
+  },
+  "homepage": "https://github.com/piecioshka/shell-history-stats#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.0.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^9.1.2",
+    "prettier": "^3.4.2",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.0.0"
+  }
+}
