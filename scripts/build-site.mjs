@@ -26,6 +26,12 @@ copyFileSync(
   fileURLToPath(new URL("og-image.png", site)),
 );
 
+// A still frame of the recording, shown until the gif has downloaded.
+copyFileSync(
+  fileURLToPath(new URL("assets/demo-poster.png", root)),
+  fileURLToPath(new URL("demo-poster.png", site)),
+);
+
 const aliases = new Map([
   ["gst", "git status"],
   ["gp", "git push"],
@@ -52,4 +58,4 @@ writeFileSync(
   "utf8",
 );
 
-console.log("site: demo.gif + og-image.png + report.html");
+console.log("site: demo.gif + demo-poster.png + og-image.png + report.html");
