@@ -13,6 +13,7 @@ export {
   readHistorySource,
   readHistorySources,
   guessShellFromPath,
+  guessShellFromContent,
 } from "./history/discover.js";
 export { parseFishHistory } from "./history/fish.js";
 export { parseZshHistory } from "./history/zsh.js";

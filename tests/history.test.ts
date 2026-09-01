@@ -4,7 +4,10 @@ import { describe, expect, it } from "vitest";
 
 import { parseBashHistory } from "../src/history/bash.js";
 import { parseFishHistory } from "../src/history/fish.js";
-import { guessShellFromPath } from "../src/history/discover.js";
+import {
+  guessShellFromContent,
+  guessShellFromPath,
+} from "../src/history/discover.js";
 import { parseZshHistory } from "../src/history/zsh.js";
 
 const fixture = (name: string): string =>
@@ -95,5 +98,26 @@ describe("guessShellFromPath", () => {
 
   it("returns null for an unknown name", () => {
     expect(guessShellFromPath("/tmp/whatever.log")).toBeNull();
+  });
+});
+
+describe("guessShellFromContent", () => {
+  it.each([
+    ["- cmd: ls\n  when: 1735730000\n", "fish"],
+    [": 1735730400:0;git push\n", "zsh"],
+    ["ls\ngit status\n", "bash"],
+    ["#1735730000\nls\n", "bash"],
+  ])("recognises %j as %s", (content, expected) => {
+    expect(guessShellFromContent(content)).toBe(expected);
+  });
+
+  it("falls back to bash for an empty file", () => {
+    expect(guessShellFromContent("")).toBe("bash");
+  });
+
+  it("is not fooled by a command that merely looks like a marker", () => {
+    // A bash history can legitimately contain a line starting with `- cmd:`
+    // only as a one-off; fish always pairs it with a `when:` line.
+    expect(guessShellFromContent("echo '- cmd: not fish'\nls\n")).toBe("bash");
   });
 });

@@ -117,6 +117,24 @@ describe("run", () => {
     expect(result.stderr).toContain("No such file");
   });
 
+  it("picks the parser from the content when the name says nothing", () => {
+    // A copy of a fish history under a neutral name used to go through the
+    // bash parser, turning its `when:` and `paths:` lines into commands.
+    const copy = join(workdir, "history-copy");
+    writeFileSync(copy, readFileSync(FISH, "utf8"), "utf8");
+
+    const result = run(["--no-aliases", "--file", copy, "--format", "json"]);
+    const report: { commands: Array<{ command: string }> } = JSON.parse(
+      result.stdout,
+    );
+    const commands = report.commands.map((entry) => entry.command);
+
+    expect(result.code).toBe(0);
+    expect(commands).not.toContain("when:");
+    expect(commands).not.toContain("paths:");
+    expect(commands).toContain("git");
+  });
+
   it("fails on a bad option without touching the history", () => {
     const result = run(["--totally-unknown"]);
     expect(result.code).toBe(1);

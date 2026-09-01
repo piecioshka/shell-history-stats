@@ -1,7 +1,8 @@
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 import {
   discoverHistorySources,
+  guessShellFromContent,
   guessShellFromPath,
   readHistorySources,
 } from "./history/discover.js";
@@ -259,8 +260,13 @@ export function run(argv: string[], version = "0.0.0"): RunResult {
       };
     }
 
+    // A name like `~/.zsh_history` settles it; anything else is recognised
+    // from the file itself, so pointing at a copy under some other name does
+    // not silently run the wrong parser.
     sources = options.files.map((file) => ({
-      shell: guessShellFromPath(file) ?? "bash",
+      shell:
+        guessShellFromPath(file) ??
+        guessShellFromContent(readFileSync(file, "utf8")),
       file,
     }));
   } else {
