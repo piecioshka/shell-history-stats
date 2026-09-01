@@ -145,12 +145,24 @@ body {
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
 .card-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
 .card-value { font-size: 24px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
-.toc { margin: 0 0 36px; padding: 14px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
-.toc-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; }
-.toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
-.toc-list li { margin: 3px 0; break-inside: avoid; }
-.toc-list a { color: var(--fg); text-decoration: none; font-size: 14px; border-bottom: 1px solid transparent; }
-.toc-list a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+.toc { margin: 0 0 36px; }
+.toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.toc-list a {
+  display: inline-block;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.toc-list a:hover { border-color: var(--accent); color: var(--accent); }
+.tail { margin-top: 6px; }
+.tail summary { color: var(--muted); font-size: 13px; cursor: pointer; padding: 4px 0; }
+.tail summary:hover { color: var(--accent); }
+.tail[open] summary { margin-bottom: 6px; }
 .section { margin-bottom: 36px; scroll-margin-top: 16px; }
 .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 0 0 14px; }
 .subsection-title { font-size: 15px; margin: 20px 0 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--accent); }
@@ -200,10 +212,12 @@ function tableOfContents(html: string): string {
   }
 
   const items = titles
-    .map((title) => `<li><a href="#${slug(title)}">${title}</a></li>`)
+    .map(
+      (title) => `<li><a href="#${slug(title)}">${escapeHtml(title)}</a></li>`,
+    )
     .join("");
 
-  return `<nav class="toc" aria-label="Contents"><p class="toc-title">Contents</p><ul class="toc-list">${items}</ul></nav>`;
+  return `<nav class="toc" aria-label="Contents"><ul class="toc-list">${items}</ul></nav>`;
 }
 
 function table(
@@ -253,17 +267,39 @@ function flagBlock(command: Report["flagsByCommand"][number]): string {
     return `${heading}<p class="note">Never used a single flag.</p>`;
   }
 
+  // A long tail of flags used once each buries the handful that matter, so
+  // only the repeatedly used ones stay open; the rest are one click away.
+  // Flags are already sorted by count, so the tail is a plain suffix.
+  const repeated = command.flags.filter((flag) => flag.count > 1).length;
+  // Hiding one or two rows is not worth an extra click.
+  const shownCount =
+    command.flags.length - repeated > 2 ? repeated : command.flags.length;
+  const shown = command.flags.slice(0, shownCount);
+  const tailFlags = command.flags.slice(shownCount);
+
+  const rows = (flags: typeof command.flags) =>
+    flags.map((flag) => [flag.flag, String(flag.count), percent(flag.share)]);
+
+  const main = table(["Flag", "Count", "Of runs"], rows(shown), [
+    false,
+    true,
+    true,
+  ]);
+
+  if (tailFlags.length === 0) {
+    return heading + main;
+  }
+
+  const tail = table(["Flag", "Count", "Of runs"], rows(tailFlags), [
+    false,
+    true,
+    true,
+  ]);
+
   return (
     heading +
-    table(
-      ["Flag", "Count", "Of runs"],
-      command.flags.map((flag) => [
-        flag.flag,
-        String(flag.count),
-        percent(flag.share),
-      ]),
-      [false, true, true],
-    )
+    main +
+    `<details class="tail"><summary>Show ${tailFlags.length} rarely used flags</summary>${tail}</details>`
   );
 }
 

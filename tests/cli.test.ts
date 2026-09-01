@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -229,6 +229,41 @@ describe("run", () => {
 
     expect(anchors.length).toBeGreaterThan(1);
     expect(ids).toEqual(expect.arrayContaining(anchors));
+  });
+
+  it("keeps one-off flags out of the way without dropping them", () => {
+    // A command with two flags used often and three used once each - the shape
+    // that made the flags section unreadable before the tail was collapsed.
+    const history = join(workdir, "tail_history");
+    writeFileSync(
+      history,
+      [
+        ...Array.from({ length: 5 }, () => "git commit -m"),
+        ...Array.from({ length: 4 }, () => "git commit -v"),
+        "git commit --amend",
+        "git commit --no-verify",
+        "git commit --squash",
+      ].join("\n"),
+      "utf8",
+    );
+
+    const target = join(workdir, "tail.html");
+    run([
+      "--no-aliases",
+      "--file",
+      history,
+      "--format",
+      "html",
+      "--out",
+      target,
+    ]);
+    const html = readFileSync(target, "utf8");
+
+    expect(html).toMatch(/<summary>Show 3 rarely used flags<\/summary>/);
+    // Collapsed, not discarded - every flag is still in the document.
+    for (const flag of ["--amend", "--no-verify", "--squash"]) {
+      expect(html).toContain(flag);
+    }
   });
 
   it("places the alias ranking next to the hygiene section", () => {
