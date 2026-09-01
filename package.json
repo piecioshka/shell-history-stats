@@ -1,6 +1,6 @@
 {
   "name": "shell-history-stats",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "🔨 Analyze your local shell history (fish, zsh, bash) and build statistics of the most used commands, subcommands and flags",
   "keywords": [
     "shell",
