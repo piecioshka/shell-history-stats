@@ -291,4 +291,21 @@ describe("run", () => {
     expect(html).toContain("<style>");
     expect(html).not.toMatch(/<script|https?:\/\//);
   });
+
+  it("carries its favicon inline so a moved report keeps it", () => {
+    const target = join(workdir, "favicon.html");
+    run([...base, "--format", "html", "--out", target]);
+    const html = readFileSync(target, "utf8");
+
+    const href = html.match(/<link rel="icon" href="([^"]+)">/)?.[1];
+    expect(href).toMatch(/^data:image\/svg\+xml,/);
+
+    // The '#' of every colour has to be encoded, or the URI stops at the
+    // first one and the browser gets a truncated document.
+    expect(href).not.toContain("#");
+
+    const svg = decodeURIComponent(href!.split(",")[1] ?? "");
+    expect(svg).toMatch(/^<svg[^>]*xmlns=/);
+    expect(svg).toContain("</svg>");
+  });
 });

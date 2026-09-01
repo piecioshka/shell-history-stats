@@ -82,6 +82,7 @@ export function renderHtml(report: Report): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shell history stats</title>
+<link rel="icon" href="${FAVICON}">
 <style>
 ${STYLES}
 </style>
@@ -112,20 +113,21 @@ ${STYLES}
 `;
 }
 
+// The mark itself, shared by the header logo and the favicon so the two cannot
+// drift apart. Colours are the project's own, kept literal so it looks the same
+// in both themes.
+const LOGO_SHAPES = `<rect width="128" height="128" rx="24" fill="#231f1c"/><g stroke="#e0825a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M28 30 L47 46 L28 62"/><line x1="58" y1="62" x2="86" y2="62"/></g><rect x="26" y="90" width="14" height="14" rx="3" fill="#f0e6da"/><rect x="45" y="78" width="14" height="26" rx="3" fill="#e0825a"/><rect x="64" y="84" width="14" height="20" rx="3" fill="#f0e6da"/><rect x="83" y="92" width="14" height="12" rx="3" fill="#f0e6da"/>`;
+
 // Inlined rather than linked: the report is one file that has to render from
-// anywhere, so it cannot depend on assets/ travelling with it. Colours are the
-// project's own, kept literal here so the mark looks the same in both themes.
-const LOGO = `<svg class="logo" viewBox="0 0 128 128" width="44" height="44" role="img" aria-label="shell-history-stats logo">
-  <rect width="128" height="128" rx="24" fill="#231f1c"/>
-  <g stroke="#e0825a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M28 30 L47 46 L28 62"/>
-    <line x1="58" y1="62" x2="86" y2="62"/>
-  </g>
-  <rect x="26" y="90" width="14" height="14" rx="3" fill="#f0e6da"/>
-  <rect x="45" y="78" width="14" height="26" rx="3" fill="#e0825a"/>
-  <rect x="64" y="84" width="14" height="20" rx="3" fill="#f0e6da"/>
-  <rect x="83" y="92" width="14" height="12" rx="3" fill="#f0e6da"/>
-</svg>`;
+// anywhere, so it cannot depend on assets/ travelling with it.
+const LOGO = `<svg class="logo" viewBox="0 0 128 128" width="44" height="44" role="img" aria-label="shell-history-stats logo">${LOGO_SHAPES}</svg>`;
+
+// A data URI for the same reason - a linked file would 404 the moment the
+// report is moved. Percent-encoded because the markup carries '#' colours,
+// which would otherwise cut the URI short at the fragment.
+const FAVICON = `data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">${LOGO_SHAPES}</svg>`,
+)}`;
 
 const STYLES = `:root {
   color-scheme: light dark;
