@@ -156,6 +156,10 @@ h2 {
   color: var(--ink-soft);
 }
 
+.demo-link {
+  display: block;
+}
+
 .demo {
   display: block;
   width: 100%;

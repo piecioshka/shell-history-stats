@@ -65,14 +65,19 @@
     <main>
       <section class="shell section">
         <h2>What a run looks like</h2>
-        <img
-          class="demo"
-          src="demo-poster.png"
-          data-animated="demo.gif"
-          width="1160"
-          height="660"
-          alt="Terminal recording: shell-history-stats printing command rankings, flag usage and an alias ranking"
-        />
+        <a class="demo-link" href="demo.gif">
+          <img
+            class="demo"
+            src="demo-poster.png"
+            width="1160"
+            height="660"
+            alt="A shell-history-stats report: rankings of top commands, subcommands and the aliases behind them"
+          />
+        </a>
+        <p class="note">
+          A single run over the sample history.
+          <a href="demo.gif">Watch the recording</a>.
+        </p>
       </section>
 
       <section class="shell section">
@@ -184,18 +189,5 @@ npx shell-history-stats --format html --out report.html --since 90d</code></pre>
         <a href="https://piecioshka.mit-license.org">MIT License</a>
       </p>
     </footer>
-    <script>
-      // Show the still frame immediately, then swap in the recording once it
-      // has downloaded - the gif opens on an empty terminal, which reads as a
-      // broken image while it loads.
-      const demo = document.querySelector(".demo[data-animated]");
-      if (demo) {
-        const animated = new Image();
-        animated.onload = () => {
-          demo.src = demo.dataset.animated;
-        };
-        animated.src = demo.dataset.animated;
-      }
-    </script>
   </body>
 </html>
