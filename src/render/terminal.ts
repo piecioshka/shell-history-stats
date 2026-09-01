@@ -1,5 +1,11 @@
 import type { Report } from "../stats/report.js";
-import { bar, percent, renderTable, truncate } from "./table.js";
+import {
+  bar,
+  formatGeneratedAt,
+  percent,
+  renderTable,
+  truncate,
+} from "./table.js";
 
 export interface TerminalOptions {
   color?: boolean;
@@ -28,7 +34,7 @@ export function renderTerminal(
   sections.push(
     [
       bold("Shell history stats"),
-      dim(`generated ${report.generatedAt.slice(0, 19).replace("T", " ")}`),
+      dim(`generated ${formatGeneratedAt(report.generatedAt)}`),
       "",
       `Entries: ${report.summary.entries}   Invocations: ${report.summary.invocations}   Unique commands: ${report.summary.uniqueCommands}`,
       `Ran without any flag: ${report.summary.bare} of ${report.summary.invocations} (${percent(report.summary.bareRatio)})`,

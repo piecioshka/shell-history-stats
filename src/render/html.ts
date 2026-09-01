@@ -1,5 +1,5 @@
 import type { Report } from "../stats/report.js";
-import { percent, truncate } from "./table.js";
+import { formatGeneratedAt, percent, truncate } from "./table.js";
 
 /**
  * A self-contained page: no external requests, no inline style attributes -
@@ -89,8 +89,11 @@ ${STYLES}
 <body>
 <main class="page">
   <header class="header">
-    <h1 class="title">Shell history stats</h1>
-    <p class="subtitle">Generated ${escapeHtml(report.generatedAt.slice(0, 10))}</p>
+    ${LOGO}
+    <div>
+      <h1 class="title">Shell history stats</h1>
+      <p class="subtitle">Generated ${escapeHtml(formatGeneratedAt(report.generatedAt))}</p>
+    </div>
   </header>
 
   <section class="cards">
@@ -108,6 +111,21 @@ ${STYLES}
 </html>
 `;
 }
+
+// Inlined rather than linked: the report is one file that has to render from
+// anywhere, so it cannot depend on assets/ travelling with it. Colours are the
+// project's own, kept literal here so the mark looks the same in both themes.
+const LOGO = `<svg class="logo" viewBox="0 0 128 128" width="44" height="44" role="img" aria-label="shell-history-stats logo">
+  <rect width="128" height="128" rx="24" fill="#231f1c"/>
+  <g stroke="#e0825a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M28 30 L47 46 L28 62"/>
+    <line x1="58" y1="62" x2="86" y2="62"/>
+  </g>
+  <rect x="26" y="90" width="14" height="14" rx="3" fill="#f0e6da"/>
+  <rect x="45" y="78" width="14" height="26" rx="3" fill="#e0825a"/>
+  <rect x="64" y="84" width="14" height="20" rx="3" fill="#f0e6da"/>
+  <rect x="83" y="92" width="14" height="12" rx="3" fill="#f0e6da"/>
+</svg>`;
 
 const STYLES = `:root {
   color-scheme: light dark;
@@ -138,7 +156,8 @@ body {
   font: 15px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 .page { max-width: 900px; margin: 0 auto; padding: 40px 20px 72px; }
-.header { border-bottom: 2px solid var(--fg); padding-bottom: 16px; margin-bottom: 28px; }
+.header { border-bottom: 2px solid var(--fg); padding-bottom: 16px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px; }
+.logo { flex: none; border-radius: 9px; }
 .title { margin: 0; font-size: 30px; letter-spacing: -0.02em; }
 .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 36px; }

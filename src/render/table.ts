@@ -62,6 +62,21 @@ export function percent(value: number, digits = 1): string {
   return `${(value * 100).toFixed(digits)}%`;
 }
 
+/**
+ * Report timestamps are stored as UTC but read by a person sitting in front of
+ * the machine that produced them, so they are shown in local time - slicing the
+ * ISO string instead would print UTC under a local-looking label.
+ */
+export function formatGeneratedAt(iso: string): string {
+  const at = new Date(iso);
+  const pad2 = (value: number) => String(value).padStart(2, "0");
+
+  const date = `${at.getFullYear()}-${pad2(at.getMonth() + 1)}-${pad2(at.getDate())}`;
+  const time = `${pad2(at.getHours())}:${pad2(at.getMinutes())}`;
+
+  return `${date} ${time}`;
+}
+
 export function truncate(text: string, max: number): string {
   const singleLine = text.replace(/\s+/g, " ").trim();
   return singleLine.length <= max

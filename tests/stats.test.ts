@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { HistoryEntry } from "../src/history/types.js";
 import type { Invocation } from "../src/parse/invocation.js";
+import { formatGeneratedAt } from "../src/render/table.js";
 import { redact } from "../src/redact.js";
 import {
   aliasUsageSummary,
@@ -285,6 +286,29 @@ describe("hygiene", () => {
     expect(editDistanceWithin("git", "gt", 1)).toBe(true);
     expect(editDistanceWithin("git", "xyz", 1)).toBe(false);
     expect(editDistanceWithin("git", "gitkraken", 1)).toBe(false);
+  });
+});
+
+describe("formatGeneratedAt", () => {
+  it("shows the date and the time", () => {
+    expect(formatGeneratedAt("2026-09-01T13:25:07.000Z")).toMatch(
+      /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/,
+    );
+  });
+
+  it("renders the timestamp in local time, not UTC", () => {
+    // Slicing the ISO string printed UTC under a local-looking label, so a
+    // report generated at 15:25 in Warsaw claimed 13:25. The suite pins
+    // TZ=Europe/Warsaw so this stays a real assertion rather than a tautology.
+    expect(formatGeneratedAt("2026-09-01T13:25:07.000Z")).toBe(
+      "2026-09-01 15:25",
+    );
+  });
+
+  it("rolls over the date when local time is a day ahead", () => {
+    expect(formatGeneratedAt("2026-09-01T22:30:00.000Z")).toBe(
+      "2026-09-02 00:30",
+    );
   });
 });
 

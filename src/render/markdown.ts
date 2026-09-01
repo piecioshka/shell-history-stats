@@ -1,11 +1,16 @@
 import type { Report } from "../stats/report.js";
-import { percent, renderMarkdownTable, truncate } from "./table.js";
+import {
+  formatGeneratedAt,
+  percent,
+  renderMarkdownTable,
+  truncate,
+} from "./table.js";
 
 export function renderMarkdown(report: Report): string {
   const sections: string[] = [
     "# Shell history stats",
     "",
-    `Generated ${report.generatedAt.slice(0, 10)}.`,
+    `Generated ${formatGeneratedAt(report.generatedAt)}.`,
     "",
     `- Entries: **${report.summary.entries}**`,
     `- Invocations: **${report.summary.invocations}**`,
