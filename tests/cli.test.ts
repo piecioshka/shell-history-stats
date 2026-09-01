@@ -204,6 +204,50 @@ describe("run", () => {
     expect(html).toMatch(/--pct:\d/);
   });
 
+  it("gives every progress bar the same track width", () => {
+    const target = join(workdir, "tracks.html");
+    run([...base, "--format", "html", "--out", target]);
+    const html = readFileSync(target, "utf8");
+
+    // Fixed outer columns; with fr/auto the tracks sized to their neighbours
+    // and came out a few pixels different in every section.
+    expect(html).toMatch(/\.bar-row\s*\{[^}]*grid-template-columns:\s*180px/);
+    expect(html).toMatch(/\.bar-track\s*\{[^}]*justify-self:\s*start/);
+  });
+
+  it("builds a table of contents linking to every section", () => {
+    const target = join(workdir, "toc.html");
+    run([...base, "--format", "html", "--out", target]);
+    const html = readFileSync(target, "utf8");
+
+    const anchors = [...html.matchAll(/<li><a href="#([^"]+)">/g)].map(
+      (m) => m[1],
+    );
+    const ids = [
+      ...html.matchAll(/<section class="section" id="([^"]+)">/g),
+    ].map((m) => m[1]);
+
+    expect(anchors.length).toBeGreaterThan(1);
+    expect(ids).toEqual(expect.arrayContaining(anchors));
+  });
+
+  it("places the alias ranking next to the hygiene section", () => {
+    const target = join(workdir, "order.html");
+    run([...base, "--format", "html", "--out", target]);
+    const html = readFileSync(target, "utf8");
+
+    const aliases = html.indexOf('id="most-used-aliases"');
+    const hygiene = html.indexOf('id="hygiene"');
+    const worthAnAlias = html.indexOf("Worth an alias");
+
+    if (aliases !== -1) {
+      expect(aliases).toBeLessThan(hygiene);
+      if (worthAnAlias !== -1) {
+        expect(aliases).toBeLessThan(worthAnAlias);
+      }
+    }
+  });
+
   it("produces html that carries its own styles and no external requests", () => {
     const target = join(workdir, "page.html");
     run([...base, "--format", "html", "--out", target]);

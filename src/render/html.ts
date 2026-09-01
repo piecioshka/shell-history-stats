@@ -6,6 +6,76 @@ import { percent, truncate } from "./table.js";
  * bar lengths are passed as a CSS custom property on each row.
  */
 export function renderHtml(report: Report): string {
+  // Sections are assembled first so the table of contents can be built from the
+  // ones that actually made it in - an empty section must not get a TOC entry.
+  const sections = [
+    section(
+      "Shells",
+      table(
+        ["Shell", "Entries", "Invocations", "Share"],
+        report.shells.map((shell) => [
+          shell.shell,
+          String(shell.entries),
+          String(shell.invocations),
+          percent(shell.share),
+        ]),
+        [false, true, true, true],
+      ),
+    ),
+
+    section(
+      "Top commands",
+      barTable(
+        report.commands.map((command) => ({
+          label: command.command,
+          value: command.count,
+          note: `${percent(command.bareRatio)} with no flags`,
+        })),
+      ),
+    ),
+
+    report.subcommands.length > 0
+      ? section(
+          "Top subcommands",
+          barTable(
+            report.subcommands.map((item) => ({
+              label: `${item.command} ${item.subcommand}`,
+              value: item.count,
+              note: `${percent(item.bareRatio)} with no flags`,
+            })),
+          ),
+        )
+      : "",
+
+    section(
+      "Flags you actually use",
+      report.flagsByCommand.map((command) => flagBlock(command)).join("\n"),
+    ),
+
+    temporalSection(report),
+
+    report.paths.directories.length > 0
+      ? section(
+          "Busiest directories",
+          `<p class="note">Based on ${report.paths.withPaths} of ${report.paths.totalEntries} entries (${percent(report.paths.coverage)}) that record paths - fish only.</p>` +
+            barTable(
+              report.paths.directories.map((item) => ({
+                label: truncate(item.directory, 70),
+                value: item.count,
+              })),
+            ),
+        )
+      : "",
+
+    // Kept next to Hygiene, whose "Worth an alias" list is the other half of
+    // the same story: which shorthands exist, and which are still missing.
+    aliasSection(report),
+
+    hygieneSection(report),
+  ]
+    .filter((html) => html !== "")
+    .join("\n\n  ");
+
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -30,33 +100,9 @@ ${STYLES}
     ${card("Ran with no flags", percent(report.summary.bareRatio))}
   </section>
 
-  ${section(
-    "Shells",
-    table(
-      ["Shell", "Entries", "Invocations", "Share"],
-      report.shells.map((shell) => [
-        shell.shell,
-        String(shell.entries),
-        String(shell.invocations),
-        percent(shell.share),
-      ]),
-      [false, true, true, true],
-    ),
-  )}
+  ${tableOfContents(sections)}
 
-  ${section("Top commands", barTable(report.commands.map((command) => ({ label: command.command, value: command.count, note: `${percent(command.bareRatio)} with no flags` }))))}
-
-  ${report.subcommands.length > 0 ? section("Top subcommands", barTable(report.subcommands.map((item) => ({ label: `${item.command} ${item.subcommand}`, value: item.count, note: `${percent(item.bareRatio)} with no flags` })))) : ""}
-
-  ${section("Flags you actually use", report.flagsByCommand.map((command) => flagBlock(command)).join("\n"))}
-
-  ${aliasSection(report)}
-
-  ${temporalSection(report)}
-
-  ${report.paths.directories.length > 0 ? section("Busiest directories", `<p class="note">Based on ${report.paths.withPaths} of ${report.paths.totalEntries} entries (${percent(report.paths.coverage)}) that record paths - fish only.</p>` + barTable(report.paths.directories.map((item) => ({ label: truncate(item.directory, 70), value: item.count })))) : ""}
-
-  ${hygieneSection(report)}
+  ${sections}
 </main>
 </body>
 </html>
@@ -99,7 +145,13 @@ body {
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
 .card-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
 .card-value { font-size: 24px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
-.section { margin-bottom: 36px; }
+.toc { margin: 0 0 36px; padding: 14px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+.toc-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; }
+.toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+.toc-list li { margin: 3px 0; break-inside: avoid; }
+.toc-list a { color: var(--fg); text-decoration: none; font-size: 14px; border-bottom: 1px solid transparent; }
+.toc-list a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+.section { margin-bottom: 36px; scroll-margin-top: 16px; }
 .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 0 0 14px; }
 .subsection-title { font-size: 15px; margin: 20px 0 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--accent); }
 .note { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
@@ -108,20 +160,50 @@ th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--lin
 th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.bar-row { display: grid; grid-template-columns: minmax(120px, 1.4fr) 3fr auto; gap: 12px; align-items: center; padding: 4px 0; }
+/* Fixed outer columns keep every track the same width across all sections;
+   with fr/auto the label and value columns sized to their content instead. */
+.bar-row { display: grid; grid-template-columns: 180px minmax(0, 1fr) 200px; gap: 12px; align-items: center; padding: 4px 0; }
 .bar-label { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bar-track { background: var(--bar); border-radius: 3px; height: 14px; overflow: hidden; }
+.bar-track { background: var(--bar); border-radius: 3px; height: 14px; overflow: hidden; justify-self: start; width: 100%; }
 /* display:block matters: a span is inline by default and would ignore width. */
 .bar-fill { display: block; background: var(--accent); height: 100%; width: calc(var(--pct) * 1%); border-radius: 3px; }
-.bar-value { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.bar-value { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 640px) {
+  .bar-row { grid-template-columns: 120px minmax(0, 1fr); }
+  .bar-value { grid-column: 2; }
+}
 .overflow { overflow-x: auto; }`;
 
 function card(label: string, value: string): string {
   return `<div class="card"><div class="card-label">${escapeHtml(label)}</div><div class="card-value">${escapeHtml(value)}</div></div>`;
 }
 
+function slug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 function section(title: string, body: string): string {
-  return `<section class="section"><h2 class="section-title">${escapeHtml(title)}</h2>${body}</section>`;
+  return `<section class="section" id="${slug(title)}"><h2 class="section-title">${escapeHtml(title)}</h2>${body}</section>`;
+}
+
+/** Builds the table of contents from the sections that were actually rendered. */
+function tableOfContents(html: string): string {
+  const titles = [
+    ...html.matchAll(/<h2 class="section-title">([^<]+)<\/h2>/g),
+  ].map((match) => match[1] as string);
+
+  if (titles.length < 2) {
+    return "";
+  }
+
+  const items = titles
+    .map((title) => `<li><a href="#${slug(title)}">${title}</a></li>`)
+    .join("");
+
+  return `<nav class="toc" aria-label="Contents"><p class="toc-title">Contents</p><ul class="toc-list">${items}</ul></nav>`;
 }
 
 function table(
