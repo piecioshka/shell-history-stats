@@ -134,7 +134,12 @@ Each shell stores history differently, and the parser handles each one on its ow
 
 Sections that need a timestamp say how many entries they had to skip, so a bash-heavy machine never silently reports a partial picture.
 
-> [!NOTE] Aliases are read by asking your shell for its own alias table, because plugin frameworks like oh-my-zsh define most aliases at load time rather than in a file. Use `--no-aliases` to skip that step.
+<!-- prettier-ignore-start -->
+
+> [!NOTE]
+> Aliases are read by asking your shell for its own alias table, because plugin frameworks like oh-my-zsh define most aliases at load time rather than in a file. Use `--no-aliases` to skip that step.
+
+<!-- prettier-ignore-end -->
 
 ## Privacy 🛡️
 
