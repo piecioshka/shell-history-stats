@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import type { HistoryEntry } from "../src/history/types.js";
 import type { Invocation } from "../src/parse/invocation.js";
 import { formatGeneratedAt } from "../src/render/table.js";
+import { homedir } from "node:os";
+
 import { redact } from "../src/redact.js";
 import {
   aliasUsageSummary,
@@ -327,9 +329,75 @@ describe("redact", () => {
     );
   });
 
+  it.each([
+    // Attached values: MySQL and Docker take the password glued to the flag.
+    ["mysql -u root -pSuperSecret123", "SuperSecret123"],
+    ["docker login -u me -p mypassword123 registry.io", "mypassword123"],
+    // user:password pairs, as an argument and inside a connection URI.
+    ["curl -u admin:hunter2 https://api.example.com", "hunter2"],
+    ["psql postgres://user:p4ssw0rd@localhost:5432/db", "p4ssw0rd"],
+    ["git clone https://me:tokenvalue123@github.com/x/y.git", "tokenvalue123"],
+    // Secrets carried by a header rather than a flag.
+    ["curl -H 'X-Api-Key: abcd1234efgh5678' url", "abcd1234efgh5678"],
+    [
+      'curl -H "Authorization: Bearer abcd1234efgh5678" url',
+      "abcd1234efgh5678",
+    ],
+  ])("masks %s", (input, secret) => {
+    expect(redact(input)).not.toContain(secret);
+  });
+
+  it("stays linear on long inputs that never match", () => {
+    // Every pattern is length-capped so a pathological history entry cannot
+    // make redaction backtrack quadratically.
+    const inputs = [
+      `curl -H ${"a".repeat(100_000)}token: x`,
+      `x -u ${"a".repeat(100_000)}:b`,
+      `https://${"a".repeat(50_000)}:${"b".repeat(50_000)}@host`,
+    ];
+
+    const start = Date.now();
+    for (const input of inputs) redact(input);
+
+    expect(Date.now() - start).toBeLessThan(1000);
+  });
+
   it("keeps normal paths readable", () => {
     const path = "/Users/tester/projects/some-longer-directory-name/file.ts";
     expect(redact(path)).toBe(path);
+  });
+
+  it("shortens the home directory it is given", () => {
+    // The home path names the account, which a shared report should not carry.
+    expect(redact("/home/tester/bin/deploy.sh", "/home/tester")).toBe(
+      "~/bin/deploy.sh",
+    );
+    expect(redact("cd /home/tester/projects", "/home/tester")).toBe(
+      "cd ~/projects",
+    );
+  });
+
+  it("leaves a path that merely starts with the same letters", () => {
+    expect(redact("/home/tester-other/x", "/home/tester")).toBe(
+      "/home/tester-other/x",
+    );
+  });
+
+  it.each([
+    // `-p` is a plain flag for most tools; only an attached value is a secret.
+    "git log -p",
+    "docker compose up -d",
+    "ssh -p 2222 host",
+    // A colon is not a credential separator outside a header or a URI.
+    "npm run build:prod",
+    "kubectl get pods -n kube-system",
+    "curl https://example.com:8443/health",
+    "rsync -av host:/srv/data ./data",
+    // `-p` is a port here, not a password - only `docker login` takes one.
+    "docker run -p 8080:80 nginx",
+    "curl -H 'Accept: application/json' https://api.example.com",
+  ])("leaves %s alone", (input) => {
+    expect(redact(input)).toBe(input);
   });
 });
 
@@ -368,6 +436,37 @@ describe("buildReport", () => {
     );
     const report = buildReport(entries, many, { top: 5, redactSecrets: true });
     expect(report.commands).toHaveLength(5);
+  });
+
+  it("redacts a secret carried by a flag name", () => {
+    // `-pSecret` parses as one token, so the password ends up as the flag's
+    // own name rather than as free text.
+    const secret = invocation({
+      command: "mysql",
+      flags: ["-pSuperSecret123"],
+      raw: "mysql -u root -pSuperSecret123",
+    });
+    const report = buildReport(entries, [secret, secret, secret, secret], {
+      top: 10,
+      redactSecrets: true,
+    });
+
+    expect(JSON.stringify(report)).not.toContain("SuperSecret123");
+    expect(report.globalFlags[0]?.count).toBe(4);
+  });
+
+  it("shortens a home path used as the command name", () => {
+    const run = invocation({
+      command: `${homedir()}/secret-project/deploy.sh`,
+      raw: `${homedir()}/secret-project/deploy.sh --prod`,
+    });
+    const report = buildReport(entries, [run], {
+      top: 10,
+      redactSecrets: true,
+    });
+
+    expect(JSON.stringify(report)).not.toContain(homedir());
+    expect(report.commands[0]?.command).toBe("~/secret-project/deploy.sh");
   });
 
   it("redacts free text without changing counts", () => {

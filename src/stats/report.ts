@@ -122,6 +122,30 @@ export function buildReport(
 function redactReport(report: Report): Report {
   return {
     ...report,
+    // A command invoked by absolute path carries the home directory, and so
+    // names the account; masking it here covers every renderer at once.
+    commands: report.commands.map((command) => ({
+      ...command,
+      command: redact(command.command),
+    })),
+    subcommands: report.subcommands.map((item) => ({
+      ...item,
+      command: redact(item.command),
+    })),
+    // A value glued to a short flag (`-pSecret`) parses as one token, so the
+    // secret becomes the flag's own name and has to be masked like free text.
+    flagsByCommand: report.flagsByCommand.map((command) => ({
+      ...command,
+      command: redact(command.command),
+      flags: command.flags.map((flag) => ({
+        ...flag,
+        flag: redact(flag.flag),
+      })),
+    })),
+    globalFlags: report.globalFlags.map((flag) => ({
+      ...flag,
+      flag: redact(flag.flag),
+    })),
     hygiene: {
       ...report.hygiene,
       longest: report.hygiene.longest.map((item) => ({
