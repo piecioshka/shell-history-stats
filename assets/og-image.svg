@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="shell-history-stats - see which commands you actually use">
+  <rect width="1200" height="630" fill="#231f1c"/>
+
+  <!-- Faint prompt watermark, bottom right -->
+  <g stroke="#e0825a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.14">
+    <path d="M962 436 L1024 488 L962 540"/>
+    <line x1="1054" y1="540" x2="1132" y2="540"/>
+  </g>
+
+  <!-- Logo mark -->
+  <g transform="translate(80 74)">
+    <rect width="104" height="104" rx="20" fill="#2e2925"/>
+    <g stroke="#e0825a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M23 24 L38 37 L23 50"/>
+      <line x1="47" y1="50" x2="70" y2="50"/>
+    </g>
+    <rect x="21" y="73" width="11" height="11" rx="2" fill="#f0e6da"/>
+    <rect x="37" y="63" width="11" height="21" rx="2" fill="#e0825a"/>
+    <rect x="53" y="68" width="11" height="16" rx="2" fill="#f0e6da"/>
+    <rect x="69" y="74" width="11" height="10" rx="2" fill="#f0e6da"/>
+  </g>
+
+  <text x="212" y="120" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="26" letter-spacing="4" fill="#e0825a">COMMAND LINE TOOL</text>
+  <text x="212" y="177" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="54" font-weight="700" fill="#f0e6da">shell-history-stats</text>
+
+  <text x="80" y="290" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="42" fill="#f0e6da">See which commands, flags and aliases</text>
+  <text x="80" y="344" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="42" fill="#f0e6da">you <tspan font-style="italic" fill="#e0825a">actually</tspan> use.</text>
+
+  <!-- Command chip -->
+  <rect x="80" y="404" width="516" height="72" rx="12" fill="#2e2925" stroke="#463f39" stroke-width="2"/>
+  <text x="108" y="450" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" fill="#e0825a">$</text>
+  <text x="140" y="450" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" fill="#f0e6da">npx shell-history-stats</text>
+
+  <!-- Trust line -->
+  <text x="80" y="540" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="25" fill="#a89d92">Reads fish, zsh and bash &#183; runs locally &#183; no telemetry &#183; secrets masked</text>
+</svg>

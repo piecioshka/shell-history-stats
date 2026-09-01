@@ -24,21 +24,20 @@ npx shell-history-stats
 
 ![shell-history-stats demo](demo/demo.gif)
 
+Your shell has been quietly logging every command for years. This reads that log back and turns it into a report: the tools you lean on, the flags you never touch, the aliases that pay for themselves, and the hours you actually work. It runs entirely on your machine.
+
+🌐 [Landing page](https://piecioshka.github.io/shell-history-stats/) &nbsp;·&nbsp; 📊 [Sample report](https://piecioshka.github.io/shell-history-stats/report.html) &nbsp;·&nbsp; 📦 [npm](https://www.npmjs.com/package/shell-history-stats)
+
 ## Features ✨
 
 - 🐟 Reads **fish**, **zsh** and **bash** history, together or one at a time
-- 🎭 Expands your **aliases**, so `gc` counts as `git commit` and still shows which shorthand you typed
-- 🏆 Ranks your **most used aliases**, with the share of your typing they cover and the characters they save
-- 🚩 Reports the **flags you actually use** per command, with the share of runs that had no flags at all
-- 🌳 Breaks multitools into **subcommands** (`git commit`, `npm run`, `docker build`)
-- 🧵 Splits pipelines, so `ls | grep foo` counts as two invocations rather than one
-- 🎩 Sees through wrappers - `sudo apt install` counts towards `apt`, not `sudo`
-- 🕰️ Shows **when you work** by hour, weekday and month, and says how many entries lacked a timestamp
-- 📁 Ranks the **directories** you work in (fish records them)
+- 🚩 Reports the **flags you actually use** per command, with the share of runs that carried none at all
+- 🎭 Expands **aliases**, so `gc` counts towards `git commit` while still being ranked as the shorthand you typed - with the characters it saved
+- 🌳 Breaks multitools into **subcommands** (`git commit`, `npm run`, `docker build`), splits pipelines, and sees through wrappers so `sudo apt install` counts towards `apt`
+- 🕰️ Shows **when and where you work** - by hour, weekday and month, plus the directories you keep returning to
 - 🩺 Flags likely **typos** and long commands that deserve an alias
-- 🛡️ Masks anything that looks like a **secret** before it reaches the report
-- 📄 Prints tables, or writes Markdown, JSON and a self-contained HTML page
-- 📦 Zero runtime dependencies
+- 🛡️ Masks anything that looks like a **secret**, so a report is safe to share
+- 📄 Prints tables, or writes Markdown, JSON and a self-contained HTML page - with **zero runtime dependencies**
 
 ## Installation 📦
 

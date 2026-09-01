@@ -19,6 +19,13 @@ copyFileSync(
   fileURLToPath(new URL("demo.gif", site)),
 );
 
+// The social preview image lives with the other brand assets, but link
+// previews need it served from the site itself.
+copyFileSync(
+  fileURLToPath(new URL("assets/og-image.png", root)),
+  fileURLToPath(new URL("og-image.png", site)),
+);
+
 const aliases = new Map([
   ["gst", "git status"],
   ["gp", "git push"],
@@ -45,4 +52,4 @@ writeFileSync(
   "utf8",
 );
 
-console.log("site: demo.gif + report.html");
+console.log("site: demo.gif + og-image.png + report.html");
