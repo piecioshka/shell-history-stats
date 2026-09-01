@@ -4,6 +4,8 @@ import type { HistoryEntry } from "../src/history/types.js";
 import type { Invocation } from "../src/parse/invocation.js";
 import { redact } from "../src/redact.js";
 import {
+  aliasUsageSummary,
+  collectAliasStats,
   collectCommandStats,
   collectSubcommandStats,
 } from "../src/stats/commands.js";
@@ -73,6 +75,67 @@ describe("command stats", () => {
       subcommand: "commit",
       count: 2,
     });
+  });
+});
+
+describe("alias stats", () => {
+  const invocations = [
+    invocation({
+      command: "git",
+      subcommand: "commit",
+      alias: "gc",
+      aliasTarget: "git commit",
+    }),
+    invocation({
+      command: "git",
+      subcommand: "commit",
+      alias: "gc",
+      aliasTarget: "git commit",
+    }),
+    invocation({
+      command: "git",
+      subcommand: "push",
+      alias: "g",
+      aliasTarget: "git",
+    }),
+    invocation({ command: "ls" }),
+  ];
+
+  it("ranks aliases by how often they are typed", () => {
+    const stats = collectAliasStats(invocations);
+    expect(stats[0]).toMatchObject({
+      alias: "gc",
+      target: "git commit",
+      count: 2,
+    });
+    expect(stats[1]).toMatchObject({ alias: "g", target: "git", count: 1 });
+  });
+
+  it("reports the target of the alias, not of the invocation", () => {
+    // `g push` must stay `git`; the subcommand was typed by hand.
+    expect(collectAliasStats(invocations)[1]?.target).toBe("git");
+  });
+
+  it("counts the characters saved", () => {
+    // "git commit" (10) minus "gc" (2), twice.
+    expect(collectAliasStats(invocations)[0]?.charsSaved).toBe(16);
+  });
+
+  it("shares are relative to aliased invocations only", () => {
+    const stats = collectAliasStats(invocations);
+    expect(stats[0]?.share).toBeCloseTo(2 / 3);
+  });
+
+  it("summarises how much of the history went through aliases", () => {
+    expect(aliasUsageSummary(invocations)).toEqual({
+      aliased: 3,
+      total: 4,
+      ratio: 0.75,
+    });
+  });
+
+  it("returns nothing when no alias was used", () => {
+    expect(collectAliasStats([invocation({ command: "ls" })])).toEqual([]);
   });
 });
 

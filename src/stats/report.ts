@@ -2,10 +2,13 @@ import type { HistoryEntry, ShellName } from "../history/types.js";
 import type { Invocation } from "../parse/invocation.js";
 import { redact } from "../redact.js";
 import {
+  aliasUsageSummary,
+  collectAliasStats,
   collectCommandStats,
   collectShellStats,
   collectSubcommandStats,
   collectWrapperStats,
+  type AliasStat,
   type CommandStat,
   type ShellStat,
   type SubcommandStat,
@@ -43,6 +46,13 @@ export interface Report {
   subcommands: SubcommandStat[];
   flagsByCommand: CommandFlagStat[];
   globalFlags: FlagStat[];
+  aliases: {
+    /** Invocations reached through an alias, of all invocations. */
+    used: number;
+    total: number;
+    ratio: number;
+    top: AliasStat[];
+  };
   wrappers: Array<{ wrapper: string; count: number }>;
   temporal: TemporalStats;
   paths: PathStats;
@@ -69,6 +79,7 @@ export function buildReport(
   const commands = collectCommandStats(invocations);
   const hygiene = collectHygieneStats(invocations);
   const paths = collectPathStats(entries);
+  const aliasUsage = aliasUsageSummary(invocations);
 
   const report: Report = {
     generatedAt: new Date().toISOString(),
@@ -89,6 +100,12 @@ export function buildReport(
       .slice(0, top)
       .map((stat) => ({ ...stat, flags: stat.flags.slice(0, top) })),
     globalFlags: collectGlobalFlagStats(invocations).slice(0, top),
+    aliases: {
+      used: aliasUsage.aliased,
+      total: aliasUsage.total,
+      ratio: aliasUsage.ratio,
+      top: collectAliasStats(invocations).slice(0, top),
+    },
     wrappers: collectWrapperStats(invocations),
     temporal: collectTemporalStats(invocations),
     paths: { ...paths, directories: paths.directories.slice(0, top) },

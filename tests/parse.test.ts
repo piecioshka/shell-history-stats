@@ -124,6 +124,8 @@ describe("aliases", () => {
     expect(expandAlias(["gc", "-am", "msg"], table)).toEqual({
       tokens: ["git", "commit", "-v", "-am", "msg"],
       expandedFrom: "gc",
+      // "git commit -v" came from the alias; "-am msg" was typed by hand.
+      aliasTokenCount: 3,
     });
   });
 
@@ -174,6 +176,26 @@ describe("parseEntry", () => {
     expect(invocation?.command).toBe("git");
     expect(invocation?.subcommand).toBe("commit");
     expect(invocation?.alias).toBe("gc");
+  });
+
+  it("reports what the alias itself expands to, not what was typed after it", () => {
+    const table = new Map([["g", "git"]]);
+    const [invocation] = parseEntry(entry("g push --force"), table);
+    expect(invocation?.alias).toBe("g");
+    expect(invocation?.aliasTarget).toBe("git");
+    expect(invocation?.subcommand).toBe("push");
+  });
+
+  it("includes a subcommand baked into the alias", () => {
+    const table = new Map([["gc", "git commit -v"]]);
+    const [invocation] = parseEntry(entry("gc -am wip"), table);
+    expect(invocation?.aliasTarget).toBe("git commit");
+  });
+
+  it("leaves the arguments baked into an alias out of its target", () => {
+    const table = new Map([["f", 'find . -not -path "*/node_modules/*"']]);
+    const [invocation] = parseEntry(entry("f -name x"), table);
+    expect(invocation?.aliasTarget).toBe("find");
   });
 
   it("does not report an alias that only adds flags to its own name", () => {

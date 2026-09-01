@@ -175,3 +175,70 @@ export function collectWrapperStats(
 export function ratio(part: number, total: number): number {
   return total === 0 ? 0 : part / total;
 }
+
+export interface AliasStat {
+  alias: string;
+  /** What the alias itself expands to, e.g. `git commit` for `gc`. */
+  target: string;
+  count: number;
+  share: number;
+  /** How much typing the shorthand saved, summed over every use. */
+  charsSaved: number;
+}
+
+/**
+ * Which shorthands actually earn their keep. An alias used twice in two years
+ * is clutter; one used a thousand times is muscle memory worth protecting.
+ */
+export function collectAliasStats(invocations: Invocation[]): AliasStat[] {
+  const buckets = new Map<
+    string,
+    { target: string; count: number; charsSaved: number }
+  >();
+  let aliased = 0;
+
+  for (const invocation of invocations) {
+    if (invocation.alias === undefined) {
+      continue;
+    }
+
+    aliased += 1;
+    const target = invocation.aliasTarget ?? invocation.command;
+
+    let bucket = buckets.get(invocation.alias);
+    if (!bucket) {
+      bucket = { target, count: 0, charsSaved: 0 };
+      buckets.set(invocation.alias, bucket);
+    }
+
+    bucket.count += 1;
+    // The target is what the user would have had to type instead.
+    bucket.charsSaved += Math.max(0, target.length - invocation.alias.length);
+  }
+
+  return [...buckets.entries()]
+    .map(([alias, bucket]) => ({
+      alias,
+      target: bucket.target,
+      count: bucket.count,
+      share: ratio(bucket.count, aliased),
+      charsSaved: bucket.charsSaved,
+    }))
+    .sort((a, b) => b.count - a.count || a.alias.localeCompare(b.alias));
+}
+
+/** Totals for the alias section header. */
+export function aliasUsageSummary(invocations: Invocation[]): {
+  aliased: number;
+  total: number;
+  ratio: number;
+} {
+  const aliased = invocations.filter(
+    (invocation) => invocation.alias !== undefined,
+  ).length;
+  return {
+    aliased,
+    total: invocations.length,
+    ratio: ratio(aliased, invocations.length),
+  };
+}

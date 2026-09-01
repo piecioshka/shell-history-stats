@@ -16,6 +16,7 @@ Analyze your local shell history and find out which commands, subcommands and fl
 
 - 🐟 Reads **fish**, **zsh** and **bash** history, together or one at a time
 - 🎭 Expands your **aliases**, so `gc` counts as `git commit` and still shows which shorthand you typed
+- 🏆 Ranks your **most used aliases**, with the share of your typing they cover and the characters they save
 - 🚩 Reports the **flags you actually use** per command, with the share of runs that had no flags at all
 - 🌳 Breaks multitools into **subcommands** (`git commit`, `npm run`, `docker build`)
 - 🧵 Splits pipelines, so `ls | grep foo` counts as two invocations rather than one

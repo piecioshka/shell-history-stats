@@ -50,6 +50,8 @@ ${STYLES}
 
   ${section("Flags you actually use", report.flagsByCommand.map((command) => flagBlock(command)).join("\n"))}
 
+  ${aliasSection(report)}
+
   ${temporalSection(report)}
 
   ${report.paths.directories.length > 0 ? section("Busiest directories", `<p class="note">Based on ${report.paths.withPaths} of ${report.paths.totalEntries} entries (${percent(report.paths.coverage)}) that record paths - fish only.</p>` + barTable(report.paths.directories.map((item) => ({ label: truncate(item.directory, 70), value: item.count })))) : ""}
@@ -109,7 +111,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .bar-row { display: grid; grid-template-columns: minmax(120px, 1.4fr) 3fr auto; gap: 12px; align-items: center; padding: 4px 0; }
 .bar-label { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bar-track { background: var(--bar); border-radius: 3px; height: 14px; overflow: hidden; }
-.bar-fill { background: var(--accent); height: 100%; width: calc(var(--pct) * 1%); border-radius: 3px; }
+/* display:block matters: a span is inline by default and would ignore width. */
+.bar-fill { display: block; background: var(--accent); height: 100%; width: calc(var(--pct) * 1%); border-radius: 3px; }
 .bar-value { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); white-space: nowrap; }
 .overflow { overflow-x: auto; }`;
 
@@ -180,6 +183,24 @@ function flagBlock(command: Report["flagsByCommand"][number]): string {
       [false, true, true],
     )
   );
+}
+
+function aliasSection(report: Report): string {
+  if (report.aliases.top.length === 0) {
+    return "";
+  }
+
+  const note = `<p class="note">${report.aliases.used} of ${report.aliases.total} invocations (${percent(report.aliases.ratio)}) were typed as an alias.</p>`;
+
+  const bars = barTable(
+    report.aliases.top.map((alias) => ({
+      label: alias.alias,
+      value: alias.count,
+      note: `→ ${alias.target}`,
+    })),
+  );
+
+  return section("Most used aliases", note + bars);
 }
 
 function temporalSection(report: Report): string {

@@ -45,6 +45,8 @@ export interface Invocation {
   wrappers: string[];
   /** Set when the typed command was an alias, e.g. `gc` for `git commit -v`. */
   alias?: string;
+  /** The command (and subcommand) the alias itself expands to. */
+  aliasTarget?: string;
   raw: string;
 }
 
@@ -113,6 +115,13 @@ function buildInvocation(
   // a shorthand worth reporting - the user typed the command itself.
   const reportedAlias = aliasName === command ? undefined : aliasName;
 
+  // Only the tokens contributed by the alias describe what it expands to; the
+  // rest were typed by hand. Without this `g build` would look like `g -> git build`.
+  const aliasTarget =
+    reportedAlias === undefined
+      ? undefined
+      : describeAliasTarget(tokens, expansion.aliasTokenCount);
+
   const flags: string[] = [];
   let subcommand: string | undefined;
   let argCount = 0;
@@ -144,6 +153,7 @@ function buildInvocation(
     argCount,
     wrappers,
     ...(reportedAlias === undefined ? {} : { alias: reportedAlias }),
+    ...(aliasTarget === undefined ? {} : { aliasTarget }),
     raw: withoutKeywords.join(" "),
   };
 }
@@ -168,6 +178,27 @@ function isPlausibleCommand(token: string): boolean {
     return false;
   if (token.includes("=")) return false;
   return true;
+}
+
+/**
+ * Describes what an alias stands for, as `command` or `command subcommand`.
+ * Only tokens the alias itself contributed are considered, and its baked-in
+ * arguments are left out: `f` is reported as `find`, not as the whole
+ * find invocation with its exclude patterns.
+ */
+function describeAliasTarget(tokens: string[], aliasTokenCount = 1): string {
+  const fromAlias = tokens.slice(0, Math.max(1, aliasTokenCount));
+  const command = fromAlias[0] ?? "";
+
+  if (!MULTITOOLS.has(command)) {
+    return command;
+  }
+
+  const subcommand = fromAlias
+    .slice(1)
+    .find((token) => !isFlag(token) && isPlausibleSubcommand(token));
+
+  return subcommand === undefined ? command : `${command} ${subcommand}`;
 }
 
 function isPlausibleSubcommand(token: string): boolean {

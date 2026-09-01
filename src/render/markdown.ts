@@ -108,6 +108,36 @@ export function renderMarkdown(report: Report): string {
     );
   }
 
+  if (report.aliases.top.length > 0) {
+    sections.push(
+      "## Most used aliases",
+      "",
+      `${report.aliases.used} of ${report.aliases.total} invocations (${percent(
+        report.aliases.ratio,
+      )}) were typed as an alias.`,
+      "",
+      renderMarkdownTable(
+        [
+          { header: "#", align: "right" },
+          { header: "Alias" },
+          { header: "Expands to" },
+          { header: "Count", align: "right" },
+          { header: "Of aliases", align: "right" },
+          { header: "Chars saved", align: "right" },
+        ],
+        report.aliases.top.map((alias, index) => [
+          String(index + 1),
+          `\`${alias.alias}\``,
+          `\`${alias.target}\``,
+          String(alias.count),
+          percent(alias.share),
+          String(alias.charsSaved),
+        ]),
+      ),
+      "",
+    );
+  }
+
   if (report.wrappers.length > 0) {
     sections.push(
       "## Wrappers",

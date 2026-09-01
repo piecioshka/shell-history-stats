@@ -131,6 +131,35 @@ export function renderTerminal(
         .join("\n\n"),
   );
 
+  if (report.aliases.top.length > 0) {
+    sections.push(
+      heading("Most used aliases") +
+        dim(
+          `${report.aliases.used} of ${report.aliases.total} invocations (${percent(
+            report.aliases.ratio,
+          )}) were typed as an alias\n`,
+        ) +
+        renderTable(
+          [
+            { header: "#", align: "right" },
+            { header: "Alias" },
+            { header: "Expands to" },
+            { header: "Count", align: "right" },
+            { header: "Of aliases", align: "right" },
+            { header: "Chars saved", align: "right" },
+          ],
+          report.aliases.top.map((alias, index) => [
+            String(index + 1),
+            alias.alias,
+            alias.target,
+            String(alias.count),
+            percent(alias.share),
+            String(alias.charsSaved),
+          ]),
+        ),
+    );
+  }
+
   if (report.wrappers.length > 0) {
     sections.push(
       heading("Wrappers") +

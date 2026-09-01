@@ -115,7 +115,7 @@ export function expandAlias(
   tokens: string[],
   aliases: AliasTable,
   maxDepth = 10,
-): { tokens: string[]; expandedFrom?: string } {
+): { tokens: string[]; expandedFrom?: string; aliasTokenCount?: number } {
   const head = tokens[0];
   if (head === undefined || !aliases.has(head)) {
     return { tokens };
@@ -142,5 +142,9 @@ export function expandAlias(
     current = [...targetTokens, ...current.slice(1)];
   }
 
-  return { tokens: current, expandedFrom: original };
+  // How many leading tokens came from the alias definition itself, so callers
+  // can tell `g -> git` from `gc -> git commit`.
+  const aliasTokenCount = current.length - (tokens.length - 1);
+
+  return { tokens: current, expandedFrom: original, aliasTokenCount };
 }

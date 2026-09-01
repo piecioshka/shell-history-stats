@@ -193,6 +193,17 @@ describe("run", () => {
     expect(report.summary.entries).toBeLessThan(11);
   });
 
+  it("renders progress bars that a browser can actually size", () => {
+    const target = join(workdir, "bars.html");
+    run([...base, "--format", "html", "--out", target]);
+    const html = readFileSync(target, "utf8");
+
+    // A span is inline by default and would ignore width, so the fill must be
+    // a block box for the bars to show up at all.
+    expect(html).toMatch(/\.bar-fill\s*\{[^}]*display:\s*block/);
+    expect(html).toMatch(/--pct:\d/);
+  });
+
   it("produces html that carries its own styles and no external requests", () => {
     const target = join(workdir, "page.html");
     run([...base, "--format", "html", "--out", target]);
