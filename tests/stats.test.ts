@@ -121,6 +121,22 @@ describe("alias stats", () => {
     expect(collectAliasStats(invocations)[0]?.charsSaved).toBe(16);
   });
 
+  it("counts flags in the definition as saved typing", () => {
+    // `ll='ls -la'` saves the flags too, even though the ranking labels the
+    // target as plain `ls`.
+    const stats = collectAliasStats([
+      invocation({
+        command: "ls",
+        flags: ["-la"],
+        alias: "ll",
+        aliasTarget: "ls",
+        aliasExpansion: "ls -la",
+      }),
+    ]);
+
+    expect(stats[0]?.charsSaved).toBe("ls -la".length - "ll".length);
+  });
+
   it("shares are relative to aliased invocations only", () => {
     const stats = collectAliasStats(invocations);
     expect(stats[0]?.share).toBeCloseTo(2 / 3);

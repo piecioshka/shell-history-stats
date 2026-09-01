@@ -212,8 +212,13 @@ export function collectAliasStats(invocations: Invocation[]): AliasStat[] {
     }
 
     bucket.count += 1;
-    // The target is what the user would have had to type instead.
-    bucket.charsSaved += Math.max(0, target.length - invocation.alias.length);
+    // The full expansion is what the user would have had to type instead; the
+    // displayed target omits the flags an alias may carry.
+    const typedInstead = invocation.aliasExpansion ?? target;
+    bucket.charsSaved += Math.max(
+      0,
+      typedInstead.length - invocation.alias.length,
+    );
   }
 
   return [...buckets.entries()]

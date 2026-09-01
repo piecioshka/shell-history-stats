@@ -47,6 +47,8 @@ export interface Invocation {
   alias?: string;
   /** The command (and subcommand) the alias itself expands to. */
   aliasTarget?: string;
+  /** The full text the alias expands to, flags included - what the shorthand saved typing. */
+  aliasExpansion?: string;
   raw: string;
 }
 
@@ -122,6 +124,14 @@ function buildInvocation(
       ? undefined
       : describeAliasTarget(tokens, expansion.aliasTokenCount);
 
+  // The target above is deliberately just `command [subcommand]`, which would
+  // undercount an alias whose value carries flags (`ll='ls -la'`). The saved
+  // typing is measured against everything the alias contributed.
+  const aliasExpansion =
+    reportedAlias === undefined
+      ? undefined
+      : tokens.slice(0, Math.max(1, expansion.aliasTokenCount ?? 1)).join(" ");
+
   const flags: string[] = [];
   let subcommand: string | undefined;
   let argCount = 0;
@@ -154,6 +164,7 @@ function buildInvocation(
     wrappers,
     ...(reportedAlias === undefined ? {} : { alias: reportedAlias }),
     ...(aliasTarget === undefined ? {} : { aliasTarget }),
+    ...(aliasExpansion === undefined ? {} : { aliasExpansion }),
     raw: withoutKeywords.join(" "),
   };
 }
