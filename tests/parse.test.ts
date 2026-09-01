@@ -66,6 +66,20 @@ describe("splitSegments", () => {
   it("drops redirections", () => {
     expect(splitSegments("echo hi > out.txt")).toEqual([["echo", "hi"]]);
   });
+
+  it("drops a descriptor duplication whole", () => {
+    // `2>&1` must not leave a stray `1` behind - it would be counted as an
+    // argument, or as a command of its own when it leads the segment.
+    expect(splitSegments("ls > out.txt 2>&1")).toEqual([["ls"]]);
+    expect(splitSegments("make 2>&1 | tee log")).toEqual([
+      ["make"],
+      ["tee", "log"],
+    ]);
+    expect(splitSegments("deploy.sh > /dev/null 2>&1")).toEqual([
+      ["deploy.sh"],
+    ]);
+    expect(splitSegments("npm test 2>/dev/null")).toEqual([["npm", "test"]]);
+  });
 });
 
 describe("unwrap", () => {

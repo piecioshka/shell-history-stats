@@ -84,6 +84,17 @@ export function tokenize(line: string): Token[] {
       continue;
     }
 
+    // `2>&1` duplicates a descriptor: the `&` belongs to the redirection, not
+    // to the background operator, so it is taken whole before the operator
+    // check below - otherwise a stray `1` would survive as its own word.
+    const duplication = /^[0-9]*[<>]&[0-9-]+/.exec(line.slice(index));
+    if (duplication) {
+      pushCurrent();
+      tokens.push({ value: duplication[0], operator: false });
+      index += duplication[0].length;
+      continue;
+    }
+
     const operator = OPERATORS.find((candidate) =>
       line.startsWith(candidate, index),
     );
