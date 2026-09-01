@@ -1,0 +1,246 @@
+:root {
+  --bg: #faf8f5;
+  --surface: #fffefc;
+  --ink: #23201d;
+  --ink-soft: #5f584f;
+  --line: #e3ddd3;
+  --accent: #b8552f;
+  --accent-soft: #f0e4dc;
+  --radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1815;
+    --surface: #221f1b;
+    --ink: #f2ede6;
+    --ink-soft: #b3aa9e;
+    --line: #362f28;
+    --accent: #e08256;
+    --accent-soft: #33241d;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+code,
+pre {
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.shell {
+  width: min(100% - 2.5rem, 62rem);
+  margin-inline: auto;
+}
+
+.hero {
+  padding: clamp(3rem, 9vw, 6rem) 0 clamp(2rem, 5vw, 3.5rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.lede {
+  max-width: 44rem;
+  margin: 1.25rem 0 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.2rem);
+  color: var(--ink-soft);
+}
+
+.install {
+  margin: 1.75rem 0 0;
+  padding: 1rem 1.15rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.install code {
+  white-space: pre;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin: 1.6rem 0 0;
+}
+
+.cta {
+  display: inline-block;
+  padding: 0.6rem 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.cta:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cta-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.cta-primary:hover {
+  color: #fff;
+  filter: brightness(1.07);
+}
+
+.assurance {
+  max-width: 42rem;
+  margin: 1.6rem 0 0;
+  padding-left: 0.9rem;
+  border-left: 3px solid var(--accent-soft);
+  color: var(--ink-soft);
+  font-size: 0.94rem;
+}
+
+.section {
+  padding: clamp(2.5rem, 6vw, 3.75rem) 0;
+}
+
+.section + .section {
+  border-top: 1px solid var(--line);
+}
+
+h2 {
+  margin: 0 0 1.6rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.demo {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.features {
+  display: grid;
+  gap: 1.5rem 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.features h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.02rem;
+  line-height: 1.35;
+}
+
+.features p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.features code,
+.note code,
+table code {
+  padding: 0.1em 0.35em;
+  background: var(--accent-soft);
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+th,
+td {
+  padding: 0.7rem 0.9rem 0.7rem 0;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+th {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.note {
+  margin: 1.25rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.94rem;
+}
+
+footer {
+  padding: 2rem 0 3rem;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+footer a {
+  color: var(--ink-soft);
+}
+
+footer span {
+  margin: 0 0.5rem;
+  opacity: 0.5;
+}
+
+a {
+  color: var(--accent);
+}

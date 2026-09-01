@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>shell-history-stats - see which commands you actually use</title>
+    <meta
+      name="description"
+      content="A local CLI that reads your fish, zsh and bash history and reports the commands, subcommands, flags and aliases you actually use."
+    />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <meta property="og:title" content="shell-history-stats" />
+    <meta
+      property="og:description"
+      content="See which commands, flags and aliases you actually use. Runs locally, reads fish, zsh and bash."
+    />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="shell">
+        <p class="eyebrow">Command line tool</p>
+        <h1>shell-history-stats</h1>
+        <p class="lede">
+          Your shell has been keeping notes for years. This reads them back and
+          tells you which commands, subcommands, flags and aliases you actually
+          use - and which ones you never touch.
+        </p>
+
+        <pre class="install"><code>npx shell-history-stats</code></pre>
+
+        <p class="cta-row">
+          <a class="cta cta-primary" href="report.html">See a sample report</a>
+          <a
+            class="cta"
+            href="https://github.com/piecioshka/shell-history-stats"
+            >Source on GitHub</a
+          >
+        </p>
+
+        <p class="assurance">
+          Runs entirely on your machine. No network access, no telemetry, and
+          anything that looks like a secret is masked before it reaches the
+          report.
+        </p>
+      </div>
+    </header>
+
+    <main>
+      <section class="shell section">
+        <h2>What a run looks like</h2>
+        <img
+          class="demo"
+          src="demo.gif"
+          alt="Terminal recording: shell-history-stats printing command rankings, flag usage and an alias ranking"
+          loading="lazy"
+        />
+      </section>
+
+      <section class="shell section">
+        <h2>What it tells you</h2>
+        <ul class="features">
+          <li>
+            <h3>The commands behind your muscle memory</h3>
+            <p>
+              Ranked by how often you run them, with the share of runs that
+              carried no flags at all.
+            </p>
+          </li>
+          <li>
+            <h3>The flags you actually use</h3>
+            <p>
+              Per command, so you can see the three options you reach for and
+              the dozens you have never typed.
+            </p>
+          </li>
+          <li>
+            <h3>Whether your aliases earn their keep</h3>
+            <p>
+              Aliases are expanded, so <code>gc</code> counts towards
+              <code>git commit</code> while still being ranked as a shorthand,
+              with the characters it saved.
+            </p>
+          </li>
+          <li>
+            <h3>When you work</h3>
+            <p>
+              By hour, weekday and month, with an honest count of the entries
+              that carried no timestamp.
+            </p>
+          </li>
+          <li>
+            <h3>Where the rough edges are</h3>
+            <p>
+              Likely typos, commands long enough to deserve an alias, and the
+              directories you keep coming back to.
+            </p>
+          </li>
+          <li>
+            <h3>Reports you can keep</h3>
+            <p>
+              Terminal tables by default, or Markdown, JSON and a self-contained
+              HTML page.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="shell section">
+        <h2>Reads your shells on their own terms</h2>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Shell</th>
+                <th>Format</th>
+                <th>Timestamps</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>fish</code></td>
+                <td>YAML-like, with paths per entry</td>
+                <td>Always</td>
+              </tr>
+              <tr>
+                <td><code>zsh</code></td>
+                <td>
+                  <code>: &lt;started&gt;:&lt;elapsed&gt;;&lt;command&gt;</code>
+                </td>
+                <td>With <code>EXTENDED_HISTORY</code></td>
+              </tr>
+              <tr>
+                <td><code>bash</code></td>
+                <td>One command per line</td>
+                <td>Only with <code>HISTTIMEFORMAT</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">
+          Sections that need a timestamp say how many entries they had to skip,
+          so a bash-heavy machine never quietly reports a partial picture.
+        </p>
+      </section>
+
+      <section class="shell section">
+        <h2>Try it</h2>
+        <pre class="install"><code># every history file found on this machine
+npx shell-history-stats
+
+# one shell, longer rankings
+npx shell-history-stats --shell fish --top 30
+
+# an HTML report for the last 90 days
+npx shell-history-stats --format html --out report.html --since 90d</code></pre>
+      </section>
+    </main>
+
+    <footer class="shell">
+      <p>
+        <a href="https://github.com/piecioshka/shell-history-stats">GitHub</a>
+        <span aria-hidden="true">/</span>
+        <a href="https://www.npmjs.com/package/shell-history-stats">npm</a>
+        <span aria-hidden="true">/</span>
+        <a href="https://piecioshka.mit-license.org">MIT License</a>
+      </p>
+    </footer>
+  </body>
+</html>

@@ -32,6 +32,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "site:build": "npm run build && node scripts/build-site.mjs",
     "clear": "rm -rf dist coverage",
     "prepack": "npm run build",
     "test": "vitest run",

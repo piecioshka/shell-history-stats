@@ -12,6 +12,8 @@ Analyze your local shell history and find out which commands, subcommands and fl
 
 <!-- prettier-ignore-end -->
 
+![shell-history-stats in action](demo/demo.gif)
+
 ## Features ✨
 
 - 🐟 Reads **fish**, **zsh** and **bash** history, together or one at a time
@@ -73,27 +75,41 @@ shell-history-stats --format json,html --out report --since 90d
 
 ## Example output 📊
 
+An excerpt from a run over a sample history - your own report also covers flags, working hours, directories and hygiene.
+
 ```text
-Entries: 11   Invocations: 12   Unique commands: 8
-Ran without any flag: 9 of 12 (75.0%)
+Entries: 1360   Invocations: 1377   Unique commands: 26
+Ran without any flag: 894 of 1377 (64.9%)
+
+Shells
+┌───────┬─────────┬─────────────┬────────┐
+│ Shell │ Entries │ Invocations │  Share │
+├───────┼─────────┼─────────────┼────────┤
+│ fish  │    1360 │        1377 │ 100.0% │
+└───────┴─────────┴─────────────┴────────┘
 
 Top commands
-┌───┬─────────┬───────┬───────┬──────────┬───────────┐
-│ # │ Command │ Count │ Share │ No flags │ Via alias │
-├───┼─────────┼───────┼───────┼──────────┼───────────┤
-│ 1 │ git     │     3 │ 25.0% │    33.3% │ gc (2)    │
-│ 2 │ echo    │     2 │ 16.7% │   100.0% │           │
-│ 3 │ ls      │     2 │ 16.7% │    50.0% │ ll (1)    │
-└───┴─────────┴───────┴───────┴──────────┴───────────┘
+┌───┬─────────┬───────┬───────┬──────────┬────────────────────┐
+│ # │ Command │ Count │ Share │ No flags │ Via alias          │
+├───┼─────────┼───────┼───────┼──────────┼────────────────────┤
+│ 1 │ git     │   585 │ 42.5% │    54.2% │ gst (62), gp (28)  │
+│ 2 │ npm     │   257 │ 18.7% │   100.0% │ nrb (17), nrt (13) │
+│ 3 │ ls      │   158 │ 11.5% │    44.3% │ ll (34)            │
+│ 4 │ cd      │    60 │  4.4% │   100.0% │                    │
+│ 5 │ docker  │    59 │  4.3% │    23.7% │ dc (9)             │
+└───┴─────────┴───────┴───────┴──────────┴────────────────────┘
 
-Flags you actually use
-git - 3 runs, 33.3% with no flags
-  ┌──────┬───────┬─────────┐
-  │ Flag │ Count │ Of runs │
-  ├──────┼───────┼─────────┤
-  │ -m   │     1 │   33.3% │
-  │ -v   │     1 │   33.3% │
-  └──────┴───────┴─────────┘
+Most used aliases
+227 of 1377 invocations (16.5%) were typed as an alias
+┌───┬───────┬────────────┬───────┬────────────┬─────────────┐
+│ # │ Alias │ Expands to │ Count │ Of aliases │ Chars saved │
+├───┼───────┼────────────┼───────┼────────────┼─────────────┤
+│ 1 │ gst   │ git status │    62 │      27.3% │         434 │
+│ 2 │ ll    │ ls         │    34 │      15.0% │         136 │
+│ 3 │ gp    │ git push   │    28 │      12.3% │         168 │
+│ 4 │ gd    │ git diff   │    24 │      10.6% │         144 │
+│ 5 │ gcm   │ git commit │    21 │       9.3% │         210 │
+└───┴───────┴────────────┴───────┴────────────┴─────────────┘
 ```
 
 ## How it reads your history 🔍
@@ -135,6 +151,16 @@ const report = buildReport(entries, parseEntries(entries), {
 
 console.log(renderMarkdown(report));
 ```
+
+## Development 🛠️
+
+```bash
+npm install
+npm test
+npm run build
+```
+
+The landing page in [`site/`](site/) is static. `npm run site:build` copies the recorded demo next to it and renders `site/report.html` from `demo/history.fish` - a synthetic history kept in the repository so the sample report never contains anyone's real commands. Both generated files are ignored by git.
 
 ## Known limitations 🧭
 
