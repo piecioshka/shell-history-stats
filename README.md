@@ -1,18 +1,28 @@
-# shell-history-stats 🔨
+# shell-history-stats
 
-Analyze your local shell history and find out which commands, subcommands and flags you actually use - and which options you never touch.
+<p align="center">
+  <img src="assets/logo.svg" width="128" alt="shell-history-stats logo"/>
+</p>
 
 <!-- prettier-ignore-start -->
 
-[![npm version](https://img.shields.io/npm/v/shell-history-stats.svg)](https://www.npmjs.com/package/shell-history-stats)
-
-[![CI](https://github.com/piecioshka/shell-history-stats/actions/workflows/ci.yml/badge.svg)](https://github.com/piecioshka/shell-history-stats/actions/workflows/ci.yml)
-
+[![cli-available](https://badgen.net/static/cli/available/?icon=terminal)](#usage-)
+[![node version](https://img.shields.io/node/v/shell-history-stats.svg)](https://www.npmjs.com/package/shell-history-stats)
+[![npm version](https://badge.fury.io/js/shell-history-stats.svg)](https://badge.fury.io/js/shell-history-stats)
+[![downloads count](https://img.shields.io/npm/dt/shell-history-stats.svg)](https://www.npmjs.com/package/shell-history-stats)
+[![size](https://packagephobia.com/badge?p=shell-history-stats)](https://packagephobia.com/result?p=shell-history-stats)
 [![license](https://img.shields.io/npm/l/shell-history-stats.svg)](https://piecioshka.mit-license.org)
+[![github-ci](https://github.com/piecioshka/shell-history-stats/actions/workflows/ci.yml/badge.svg)](https://github.com/piecioshka/shell-history-stats/actions/workflows/ci.yml)
 
 <!-- prettier-ignore-end -->
 
-![shell-history-stats in action](demo/demo.gif)
+🔨 Analyze your local shell history and find out which commands, subcommands and flags you actually use - and which options you never touch.
+
+```bash
+npx shell-history-stats
+```
+
+![shell-history-stats demo](demo/demo.gif)
 
 ## Features ✨
 
