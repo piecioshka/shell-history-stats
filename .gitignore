@@ -3,7 +3,7 @@ dist/
 coverage/
 .nyc_output/
 tmp/*
-!tmp/.gitkeep
+tmp/
 *.log
 npm-debug.log*
 .DS_Store
