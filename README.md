@@ -168,21 +168,15 @@ const report = buildReport(entries, parseEntries(entries), {
 console.log(renderMarkdown(report));
 ```
 
-## Development 🛠️
-
-```bash
-npm install
-npm test
-npm run build
-```
-
-The landing page in [`site/`](site/) is static. `npm run site:build` copies the recorded demo next to it and renders `site/report.html` from `demo/history.fish` - a synthetic history kept in the repository so the sample report never contains anyone's real commands. Both generated files are ignored by git.
-
 ## Known limitations 🧭
 
 - The contents of command substitutions (`$(...)`, backticks) are counted as one opaque argument rather than analysed.
 - Typo detection is a heuristic: a rare command one edit away from a frequent one. Real tools with short names occasionally show up.
 - Only fish records working directories, so the directory ranking covers a subset of your history.
+
+## Contributing 🤝
+
+Building from source, tests and the project layout: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License 📄
 
