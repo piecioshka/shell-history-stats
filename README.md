@@ -22,9 +22,9 @@
 npx shell-history-stats
 ```
 
-[![shell-history-stats report](assets/demo-poster.png)](demo/demo.gif)
+[![shell-history-stats report](docs/demo-poster.png)](docs/demo.gif)
 
-<sub>A run over the sample history - [watch the recording](demo/demo.gif).</sub>
+<sub>A run over the sample history - [watch the recording](docs/demo.gif).</sub>
 
 Your shell has been quietly logging every command for years. This reads that log back and turns it into a report: the tools you lean on, the flags you never touch, the aliases that pay for themselves, and the hours you actually work. It runs entirely on your machine.
 

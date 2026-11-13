@@ -48,7 +48,8 @@ Tests live in `tests/` and read the sample histories in `tests/fixtures/` (`fish
 - `src/redact.ts` - masking of values that look like secrets
 - `src/index.ts` - the public library API
 - `site/` - the static landing page
-- `demo/` - the synthetic history and the recording used in the README
+- `demo/` - the synthetic history behind the recording and the sample report
+- `docs/` - the demo recording, its poster frame and the repository banner
 
 ## Landing page and demo
 

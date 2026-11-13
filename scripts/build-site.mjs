@@ -15,20 +15,20 @@ const root = new URL("../", import.meta.url);
 const site = new URL("site/", root);
 
 copyFileSync(
-  fileURLToPath(new URL("demo/demo.gif", root)),
+  fileURLToPath(new URL("docs/demo.gif", root)),
   fileURLToPath(new URL("demo.gif", site)),
 );
 
-// The social preview image lives with the other brand assets, but link
+// The repository banner doubles as the social preview image, but link
 // previews need it served from the site itself.
 copyFileSync(
-  fileURLToPath(new URL("assets/og-image.png", root)),
+  fileURLToPath(new URL("docs/banner.png", root)),
   fileURLToPath(new URL("og-image.png", site)),
 );
 
 // A still frame of the recording, shown until the gif has downloaded.
 copyFileSync(
-  fileURLToPath(new URL("assets/demo-poster.png", root)),
+  fileURLToPath(new URL("docs/demo-poster.png", root)),
   fileURLToPath(new URL("demo-poster.png", site)),
 );
 
